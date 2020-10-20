@@ -1,8 +1,7 @@
 const jwt = require('jsonwebtoken');
-const config = require('../../config');
 
 module.exports = (req,res,next) => {
-    const secret = process.env.JWT_SECRET || config.jwtSecret;
+    const secret = process.env.JWT_SECRET;
     if(!req.headers.authorization) {
         return res.status(401).json({ message: 'access denied.' });
     }
