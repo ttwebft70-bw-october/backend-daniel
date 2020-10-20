@@ -42,10 +42,10 @@ userSchema.pre('save', function(next) {
     next();
 });
 
-userSchema.post('save', function(doc, next) {
-    console.log('Saved user!');
-    next();
-});
+// userSchema.post('save', function(doc, next) {
+//     console.log('Saved user!');
+//     next();
+// });
 
 userSchema.pre('find', function(next) {
     this.select('_id username role');

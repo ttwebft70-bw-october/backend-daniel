@@ -31,57 +31,40 @@ router.get('/:id', authorize, async (req,res) => {
     }
 });
 
-// router.post('/register', async (req,res) => {
-//     if(!req.body) {
-//         return res.status(400).json({ error: 'Missing required information.' });
-//     }
-//     try {
-//         const newUser = new User(req.body);
-//         const saveUser = await newUser.save();
-        
-//         const userObject = await User.findOne({ username: req.body.username }).lean();
-        
-//         const secret = process.env.JWT_SECRET;
-//         const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
-
-//         res.status(201).json({ token });
-//     } catch(err) {
-//         if(err.errors) {
-//             const errors = Object.keys(err.errors);
-//             const errorData = [];
-
-//             errors.forEach(key => {
-//                 errorData.push({ error: key, message: err.errors[key].message })
-//             });
-
-//             return res.status(400).json(errorData);
-//         }
-
-//         if(err.keyValue) {
-//             const error = Object.keys(err.keyValue);
-//             return res.status(400).json({ error: `${error[0]} is taken.` });
-//         }
-
-//         res.status(500).json(err);
-//     }
-
-// });
-
-router.post('/register', (req,res) => {
+router.post('/register', async (req,res) => {
     if(!req.body) {
-        return res.status(400).json({ message: 'Missing required info'});
+        return res.status(400).json({ error: 'Missing required information.' });
+    }
+    try {
+        const newUser = new User(req.body);
+        const saveUser = await newUser.save();
+        
+        const userObject = await User.findOne({ username: req.body.username }).lean();
+        
+        const secret = process.env.JWT_SECRET;
+        const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
+
+        res.status(201).json({ token });
+    } catch(err) {
+        if(err.errors) {
+            const errors = Object.keys(err.errors);
+            const errorData = [];
+
+            errors.forEach(key => {
+                errorData.push({ error: key, message: err.errors[key].message })
+            });
+
+            return res.status(400).json(errorData);
+        }
+
+        if(err.keyValue) {
+            const error = Object.keys(err.keyValue);
+            return res.status(400).json({ error: `${error[0]} is taken.` });
+        }
+
+        res.status(500).json(err);
     }
 
-    const newUser = new User(req.body);
-
-    newUser
-    .save()
-    .then(data => {
-        res.status(201).json(data);
-    })
-    .catch(err => {
-        res.status(500).json(err);
-    })
 });
 
 router.post('/login', authenticate, async (req,res) => {
