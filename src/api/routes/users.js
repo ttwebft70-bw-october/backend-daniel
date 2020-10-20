@@ -45,7 +45,7 @@ router.post('/register', async (req,res) => {
         // const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
 
         // res.status(201).json({ token });
-        res.status(201).json(saveUser);
+        res.status(201).json("user is saved");
     } catch(err) {
         // if(err.errors) {
         //     const errors = Object.keys(err.errors);
