@@ -8,6 +8,9 @@
     "server": "nodemon index",
     "test": "jest ./src/server"
   },
+  "engines": {
+    "node": "12.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ttwebft70-bw-october/backend-daniel.git"
