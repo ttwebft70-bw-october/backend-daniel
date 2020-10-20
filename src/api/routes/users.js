@@ -42,7 +42,8 @@ router.post('/register', async (req,res) => {
 
         const userObject = await User.findOne({ username: req.body.username }).lean();
         
-        const token = jwt.sign(userObject, config.jwtSecret, { expiresIn: '5hr' });
+        const secret = process.env.JWT_SECRET || config.jwtSecret;
+        const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
 
         res.status(201).json({ token });
     } catch(err) {
@@ -67,7 +68,8 @@ router.post('/register', async (req,res) => {
 });
 
 router.post('/login', authenticate, async (req,res) => {
-    const token = jwt.sign(req.user, config.jwtSecret, { expiresIn: '5hr' });
+    const secret = process.env.JWT_SECRET || config.jwtSecret;
+    const token = jwt.sign(req.user, secret, { expiresIn: '5hr' });
     res.status(202).json({ token });
 });
 

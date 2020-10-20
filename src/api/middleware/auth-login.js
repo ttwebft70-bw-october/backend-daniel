@@ -7,12 +7,13 @@ module.exports = (req,res,next) => {
         if(!req.body.password) {
             return res.status(400).json({ message: 'Invalid user info.' });
         }
-
-        console.log(user[0]);
+        req.user = user[0];
         return User.findById(user[0]._id);
     })
     .then(user => {
-        req.user = user;
+        if(!bcrypt.compareSync(req.body.password, user.password)) {
+            return res.status(400).json({ message: 'Invalid user info.' });
+        }
         next();
     })
     .catch(err => {

@@ -40,7 +40,8 @@ const userSchema = new Schema({
 });
 
 userSchema.pre('save', function(next) {
-    this.password = bcrypt.hashSync(this.password, config.bcSalt);
+    const salt = process.env.BCRYPT_SALT || config.bcSalt;
+    this.password = bcrypt.hashSync(this.password, salt);
     next();
 });
 
