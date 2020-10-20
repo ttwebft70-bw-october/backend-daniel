@@ -40,9 +40,9 @@ router.post('/register', async (req,res) => {
         await newUser.save();
         
         console.log(newUser);
-        const userObject = await User.findOne({ username: req.body.username }).lean();
+        // const userObject = await User.findOne({ username: req.body.username }).lean();
         
-        const secret = process.env.JWT_SECRET;
+        // const secret = process.env.JWT_SECRET;
         // const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
 
         res.status(201).json('endpoint is working');
