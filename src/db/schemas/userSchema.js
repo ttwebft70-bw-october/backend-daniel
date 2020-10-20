@@ -32,6 +32,10 @@ const userSchema = new Schema({
                 throw new Error('Password needs 6 or more characters.');
             }
         }
+    },
+    role: {
+        type: Number,
+        default: 4
     }
 });
 
@@ -42,6 +46,11 @@ userSchema.pre('save', function(next) {
 
 userSchema.post('save', function(doc, next) {
     console.log('Saved user!');
+    next();
+});
+
+userSchema.pre('find', function(next) {
+    this.select('_id username role');
     next();
 });
 
