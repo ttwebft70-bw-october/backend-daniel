@@ -35,6 +35,7 @@ router.post('/register', async (req,res) => {
     if(!req.body) {
         return res.status(400).json({ error: 'Missing required information.' });
     }
+    console.log('Testing')
     try {
         const newUser = new User(req.body);
         await newUser.save();
