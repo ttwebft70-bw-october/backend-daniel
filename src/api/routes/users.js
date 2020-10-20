@@ -37,7 +37,7 @@ router.post('/register', async (req,res) => {
     }
     try {
         const newUser = new User(req.body);
-        const saveUser = await newUser.save();
+        // const saveUser = await newUser.save();
         
         // const userObject = await User.findOne({ username: req.body.username }).lean();
         
@@ -45,7 +45,7 @@ router.post('/register', async (req,res) => {
         // const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
 
         // res.status(201).json({ token });
-        res.status(201).json("user is saved");
+        res.status(201).json(newUser);
     } catch(err) {
         // if(err.errors) {
         //     const errors = Object.keys(err.errors);
