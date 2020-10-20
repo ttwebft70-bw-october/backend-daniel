@@ -2,7 +2,6 @@ const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 
 const User = require('../../db/models/user');
-const config = require('../../config');
 
 const authenticate = require('../middleware/auth-login');
 const authorize = require('../middleware/autho-mw');
@@ -42,7 +41,7 @@ router.post('/register', async (req,res) => {
 
         const userObject = await User.findOne({ username: req.body.username }).lean();
         
-        const secret = process.env.JWT_SECRET || config.jwtSecret;
+        const secret = process.env.JWT_SECRET;
         const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
 
         res.status(201).json({ token });
@@ -68,7 +67,7 @@ router.post('/register', async (req,res) => {
 });
 
 router.post('/login', authenticate, async (req,res) => {
-    const secret = process.env.JWT_SECRET || config.jwtSecret;
+    const secret = process.env.JWT_SECRET;
     const token = jwt.sign(req.user, secret, { expiresIn: '5hr' });
     res.status(202).json({ token });
 });
