@@ -36,8 +36,8 @@ router.post('/register', async (req,res) => {
         return res.status(400).json({ error: 'Missing required information.' });
     }
     try {
-        // const newUser = new User(req.body);
-        // await newUser.save();
+        const newUser = new User(req.body);
+        await newUser.save();
         
         // const userObject = await User.findOne({ username: req.body.username }).lean();
         
@@ -45,7 +45,7 @@ router.post('/register', async (req,res) => {
         // const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
 
         // res.status(201).json({ token });
-        res.status(201).json("endpoint is working within try block");
+        res.status(201).json(newUser);
     } catch(err) {
         // if(err.errors) {
         //     const errors = Object.keys(err.errors);
