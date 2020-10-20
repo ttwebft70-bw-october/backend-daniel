@@ -35,37 +35,37 @@ router.post('/register', async (req,res) => {
     if(!req.body) {
         return res.status(400).json({ error: 'Missing required information.' });
     }
-    try {
-        const newUser = new User(req.body);
-        await newUser.save();
+    // try {
+    //     const newUser = new User(req.body);
+    //     await newUser.save();
         
-        console.log(newUser);
-        // const userObject = await User.findOne({ username: req.body.username }).lean();
+    //     console.log(newUser);
+    //     const userObject = await User.findOne({ username: req.body.username }).lean();
         
-        // const secret = process.env.JWT_SECRET;
-        // const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
+    //     const secret = process.env.JWT_SECRET;
+    //     const token = jwt.sign(userObject, secret, { expiresIn: '5hr' });
 
-        res.status(201).json('endpoint is working');
-        // res.status(201).json({ token });
-    } catch(err) {
-        if(err.errors) {
-            const errors = Object.keys(err.errors);
-            const errorData = [];
+    //     res.status(201).json({ token });
+    // } catch(err) {
+    //     if(err.errors) {
+    //         const errors = Object.keys(err.errors);
+    //         const errorData = [];
 
-            errors.forEach(key => {
-                errorData.push({ error: key, message: err.errors[key].message })
-            });
+    //         errors.forEach(key => {
+    //             errorData.push({ error: key, message: err.errors[key].message })
+    //         });
 
-            return res.status(400).json(errorData);
-        }
+    //         return res.status(400).json(errorData);
+    //     }
 
-        if(err.keyValue) {
-            const error = Object.keys(err.keyValue);
-            return res.status(400).json({ error: `${error[0]} is taken.` });
-        }
+    //     if(err.keyValue) {
+    //         const error = Object.keys(err.keyValue);
+    //         return res.status(400).json({ error: `${error[0]} is taken.` });
+    //     }
 
-        res.status(500).json(err);
-    }
+    //     res.status(500).json(err);
+    // }
+    res.status(200).json('Endpoint working');
 });
 
 router.post('/login', authenticate, async (req,res) => {
