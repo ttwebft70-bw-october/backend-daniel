@@ -12,3 +12,5 @@ mongoose.connect(uri, {
 .catch(err => {
     console.log(err)
 });
+
+mongoose.set('debug', true);
