@@ -2,9 +2,6 @@ const { Schema } = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
-const config = require('../../config');
-
-
 const userSchema = new Schema({
     username: {
         type: String,
@@ -40,7 +37,7 @@ const userSchema = new Schema({
 });
 
 userSchema.pre('save', function(next) {
-    const salt = process.env.BCRYPT_SALT || config.bcSalt;
+    const salt = process.env.BCRYPT_SALT;
     this.password = bcrypt.hashSync(this.password, salt);
     next();
 });
