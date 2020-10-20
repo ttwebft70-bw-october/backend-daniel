@@ -1,27 +1,26 @@
 const router = require('express').Router();
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../../db/models/user');
 const config = require('../../config');
 
+const authorize = require('../middleware/auth-mw');
+
 router.get('/', (req,res) => {
     res.status(200).json({ message: 'User router works :)' });
 });
 
-router.post('/', async (req,res) => {
-    if(!req.body.password) {
-        return res.status(400).json({ error: 'Password is required.' });
-    }
-
-    if(req.body.password.length < 6) {
-        return res.status(400).json({ error: 'Password must contain 6 or more characters.' });
+router.post('/register', async (req,res) => {
+    if(!req.body) {
+        return res.status(400).json({ error: 'Missing required information.' });
     }
     try {
-        req.body.password = bcrypt.hashSync(req.body.password, config.bcSalt);
         const newUser = new User(req.body);
         await newUser.save();
-        const token = jwt.sign(req.body, config.jwtSecret, { expiresIn: '5hr' });
+
+        const userObject = await User.findOne({ username: req.body.username }).lean();
+        
+        const token = jwt.sign(userObject, config.jwtSecret, { expiresIn: '5hr' });
 
         res.status(201).json({ token });
     } catch(err) {
@@ -35,8 +34,19 @@ router.post('/', async (req,res) => {
 
             return res.status(400).json(errorData);
         }
+
+        if(err.keyValue) {
+            const error = Object.keys(err.keyValue);
+            return res.status(400).json({ error: `${error[0]} is taken.` });
+        }
+
         res.status(500).json(err);
     }
+});
+
+router.post('/login', authorize, async (req,res) => {
+    const token = jwt.sign(req.user, config.jwtSecret, { expiresIn: '5hr' });
+    res.status(202).json({ token });
 });
 
 module.exports = router;
