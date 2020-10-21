@@ -1,5 +1,6 @@
 const express = require('express');
 const helmet = require('helmet');
+const bodyParser = require('body-parser');
 const app = express();
 
 const userRouter = require('./api/routes/users');
@@ -8,8 +9,9 @@ const userRouter = require('./api/routes/users');
 const logger = require('./api/middleware/logger');
 
 app.use(helmet());
-app.use(logger);
-app.use(express.json());
+// app.use(logger);
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // routes
 app.use('/api/users', userRouter);

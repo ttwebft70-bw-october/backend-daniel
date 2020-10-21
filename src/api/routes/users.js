@@ -37,8 +37,8 @@ router.post('/register', async (req,res) => {
     }
     try {
         const newUser = new User(req.body);
-        await newUser.save();
-
+        const saveUser = await newUser.save();
+        
         const userObject = await User.findOne({ username: req.body.username }).lean();
         
         const secret = process.env.JWT_SECRET;
@@ -64,6 +64,7 @@ router.post('/register', async (req,res) => {
 
         res.status(500).json(err);
     }
+
 });
 
 router.post('/login', authenticate, async (req,res) => {

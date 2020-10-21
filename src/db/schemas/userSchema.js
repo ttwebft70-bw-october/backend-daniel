@@ -37,7 +37,7 @@ const userSchema = new Schema({
 });
 
 userSchema.pre('save', function(next) {
-    const salt = process.env.BCRYPT_SALT;
+    const salt = parseInt(process.env.BCRYPT_SALT);
     this.password = bcrypt.hashSync(this.password, salt);
     next();
 });
