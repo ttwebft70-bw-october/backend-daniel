@@ -9,7 +9,7 @@ const userRouter = require('./api/routes/users');
 const logger = require('./api/middleware/logger');
 
 app.use(helmet());
-// app.use(logger);
+app.use(logger);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 

@@ -3,6 +3,7 @@ const uri = process.env.DB_URL;
 
 mongoose.connect(uri, {
     useUnifiedTopology: true,
+    useFindAndModify: false,
     useNewUrlParser: true,
     useCreateIndex: true
 })
@@ -12,5 +13,3 @@ mongoose.connect(uri, {
 .catch(err => {
     console.log(err)
 });
-
-mongoose.set('debug', true);
