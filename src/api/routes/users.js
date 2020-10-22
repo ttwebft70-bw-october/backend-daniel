@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const User = require('../../db/models/user');
+const Product = require('../../db/models/product');
 
 const authenticate = require('../middleware/auth-login');
 const authorize = require('../middleware/autho-mw');
@@ -19,6 +20,15 @@ router.get('/', authorize, async (req,res) => {
 
 router.get('/:id', authorize, findUser, (req,res) => {
     res.status(200).json(req.user)
+});
+
+router.get('/:id/products', authorize, findUser, async (req,res) => {
+    try {
+        const products = await Product.find({ sellerId: req.params.id });
+        res.status(200).json(products);
+    } catch(err) {
+        res.status(500).json(err);
+    }
 });
 
 router.post('/register', async (req,res) => {
