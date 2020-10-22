@@ -20,16 +20,27 @@ module.exports = (req,res,next) => {
             }
         });
     } else {
-        jwt.verify(req.headers.authorization, secret, (err, decoded) => {
-            if(err) {
-                return res.status(401).json({ message: 'access denied.' });
-            }
-    
-            if(2 < decoded.role) {
-                return res.status(401).json({ message: 'access denied.' });
-            }
-    
-            next();
-        });
+        if(req.originalUrl.includes('users')) {
+            jwt.verify(req.headers.authorization, secret, (err, decoded) => {
+                if(err) {
+                    return res.status(401).json({ message: 'access denied.' });
+                }
+        
+                if(2 < decoded.role) {
+                    return res.status(401).json({ message: 'access denied.' });
+                }
+        
+                next();
+            });
+        } else if(req.originalUrl.includes('products')) {
+            jwt.verify(req.headers.authorization, secret, (err, decoded) => {
+                if(err) {
+                    return res.status(401).json({ message: 'access denied.' });
+                }
+        
+                console.log(decoded);
+                next();
+            });
+        }
     }
 }

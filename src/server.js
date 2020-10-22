@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const userRouter = require('./api/routes/users');
+const productRouter = require('./api/routes/products');
 
 // middleware
 const logger = require('./api/middleware/logger');
@@ -15,6 +16,7 @@ app.use(bodyParser.json());
 
 // routes
 app.use('/api/users', userRouter);
+app.use('/api/products', productRouter);
 
 app.get('/', (req,res) => {
     res.status(200).json({ message: 'Welcome to my African-Marketplace API. :)' });
