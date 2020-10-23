@@ -29,9 +29,10 @@ describe('server.js', () => {
         
         describe('POST /register', () => {
             let token;
-            afterEach(async () => {
+            afterAll(async () => {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                await User.findByIdAndDelete(decoded._id)
+                await User.findByIdAndDelete(decoded._id);
+                console.log("♻ USER DELETED ♻", '/register');
             });
             it('should create a new user', async () => {
                 return await supertest(server)
@@ -72,8 +73,183 @@ describe('server.js', () => {
             });
         });
 
-        // describe('POST /login', () => {
+        describe('POST /login', () => {
+            let token;
+            beforeAll(async () => {
+                return await supertest(server)
+                .post('/api/users/register')
+                .send({ username: "jest", email: "jest@jest.com", password: "jestjest" })
+                .set('Accept', 'application/json');
+            });
 
-        // })
+            afterAll(async () => {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                await User.findByIdAndDelete(decoded._id);
+                return console.log("♻ USER DELETED ♻", '/login');
+            });
+
+            it('can successfully login, returns a token', async () => {
+                return supertest(server)
+                .post('/api/users/login')
+                .send({ username: "jest", password: "jestjest" })
+                .set('Accept', 'application/json')
+                .then(res => {
+                    token = res.body.token;
+                    expect(Object.keys(res.body)[0]).toBe('token');
+                    expect(res.status).toBe(202);
+                });
+            });
+
+            it('will respond with 400 on unsuccessful authentication.', () => {
+                return supertest(server)
+                .post('/api/users/login')
+                .send({ username: "jest", password: "jestjestjest" })
+                .set('Accept', 'application/json')
+                .then(res => {
+                    expect(res.body.message).toBe('Invalid user info.');
+                    expect(res.status).toBe(400);
+                });
+            });
+        });
+
+        describe('GET /', () => {
+            let token;
+            beforeAll(() => {
+                return supertest(server)
+                .post('/api/users/register')
+                .send({ username: "jest", email: "jest@jest.com", password: "jestjest" })
+                .set('Accept', 'application/json')
+                .then(res => {
+                    token = res.body.token;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            });
+
+            afterAll(async () => {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                await User.findByIdAndDelete(decoded._id);
+                return console.log("♻ USER DELETED ♻", 'GET /');
+            });
+
+            it('can access list of users responding with 200', () => {
+                return supertest(server)
+                .get('/api/users')
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(200);
+                });
+            });
+
+            it('will deny access to list if no valid token provided responding with 401', () => {
+                return supertest(server)
+                .get('/api/users')
+                .then(res => {
+                    expect(res.status).toBe(401);
+                });
+            })
+        });
+
+        describe('/:id', () => {
+            let token;
+            let decoded;
+            beforeAll(() => {
+                return supertest(server)
+                .post('/api/users/register')
+                .send({ username: "jest", email: "jest@jest.com", password: "jestjest" })
+                .set('Accept', 'application/json')
+                .then(res => {
+                    token = res.body.token;
+                    decoded = jwt.verify(token, process.env.JWT_SECRET);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            });
+
+            it('can GET an individual user', () => {
+                return supertest(server)
+                .get(`/api/users/${decoded._id}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.body.username).toBe('jest');
+                    expect(res.status).toBe(200);
+                })
+            });
+
+            it('can GET a list of what a user is selling returning 200', () => {
+                return supertest(server)
+                .get(`/api/users/${decoded._id}/products`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(200);
+                })
+            });
+
+            it('can PUT/update a user responding with 202', () => {
+                return supertest(server)
+                .put(`/api/users/${decoded._id}`)
+                .send({ password: 'jestjestjest' })
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(202);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            });
+
+            it('will return a 404 if no user with provided ID', () => {
+                let badId = '5f8ec4474dd1b63ec48d8c4t'
+                return supertest(server)
+                .get(`/api/users/${badId}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(404);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            });
+
+            it('will return a 401 if no user with provided ID on PUT request', () => {
+                let badId = '5f8ec4474dd1b63ec48d8c4t';
+                return supertest(server)
+                .put(`/api/users/${badId}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(401);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            });
+
+            it('will return a 401 if no user with provided ID on DELETE request', () => {
+                let badId = '5f8ec4474dd1b63ec48d8c4t';
+                return supertest(server)
+                .delete(`/api/users/${badId}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(401);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            });
+
+            it('can DELETE user responding with 202', () => {
+                return supertest(server)
+                .delete(`/api/users/${decoded._id}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(202);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            });
+        });
     });
 });
