@@ -295,26 +295,6 @@ describe('server.js', () => {
             });
         });
 
-        describe('GET /:id', () => {
-            const testProduct = '5f925d2f42771100177d4ce6';
-            it('can get info on a single product returning 200', () => {
-                return supertest(server)
-                .get(`/api/products/${testProduct}`)
-                .set('Authorization', token)
-                .then(res => {
-                    expect(res.status).toBe(200);
-                });
-            });
-
-            it('will return 401 if user is not signed in.', () => {
-                return supertest(server)
-                .get(`/api/products/${testProduct}`)
-                .then(res => {
-                    expect(res.status).toBe(401);
-                })
-            });
-        });
-
         describe('POST /', () => {
             it('will return 201 if user successfully created a post', () => {
                 return supertest(server)
@@ -341,6 +321,25 @@ describe('server.js', () => {
             });
         });
 
+        describe('GET /:id', () => {
+            it('can get info on a single product returning 200', () => {
+                return supertest(server)
+                .get(`/api/products/${jestItem._id}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(200);
+                });
+            });
+
+            it('will return 401 if user is not signed in.', () => {
+                return supertest(server)
+                .get(`/api/products/${jestItem._id}`)
+                .then(res => {
+                    expect(res.status).toBe(401);
+                })
+            });
+        });
+
         describe('PUT /:id', () => {
             it("will return 202 if product info updated successfully", () => {
                 return supertest(server)
@@ -354,18 +353,52 @@ describe('server.js', () => {
                 });
             });
 
-            // it('will return 404 if no product is found with specified id', () => {
-            //     let badId = '5f90e76b2d646166d07da176';
-            //     return supertest(server)
-            //     .put(`/api/products/${badId}`)
-            //     .send({ price: 1.50 })
-            //     .set('Authorization', token)
-            //     .set('Accept', 'application/json')
-            //     .then(res => {
-            //         // console.log('SOME SORTA RESPONSE HERE');
-            //         // expect(res.status).toBe(202);
-            //     });
-            // })
+            it("will return 401 if trying to modify an existing user's product info", () => {
+                return supertest(server)
+                .put(`/api/products/5f90f96fe821b6669cd77db1`)
+                .send({ price: 1.50 })
+                .set('Authorization', token)
+                .set('Accept', 'application/json')
+                .then(res => {
+                    console.log(res.body);
+                    expect(res.status).toBe(401);
+                });
+            });
+
+            it('will return 404 if no product is found with specified id', () => {
+                let badId = '5f90e76b2d646166d07da176';
+                return supertest(server)
+                .put(`/api/products/${badId}`)
+                .send({ price: 1.50 })
+                .set('Authorization', token)
+                .set('Accept', 'application/json')
+                .then(res => {
+                    expect(res.status).toBe(404);
+                });
+            });
+        });
+
+        describe('DELETE /:id', () => {
+            it('will return 404 if product not found', () => {
+                let badId = '5f90e76b2d646166d07da176';
+                return supertest(server)
+                .delete(`/api/products/${badId}`)
+                .send({ price: 1.50 })
+                .set('Authorization', token)
+                .set('Accept', 'application/json')
+                .then(res => {
+                    expect(res.status).toBe(404);
+                });
+            });
+
+            it("will return 202 if product info updated successfully", () => {
+                return supertest(server)
+                .delete(`/api/products/${jestItem._id}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(202);
+                });
+            });
         });
     });
 });

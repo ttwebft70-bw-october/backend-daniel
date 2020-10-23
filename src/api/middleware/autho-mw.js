@@ -40,6 +40,10 @@ module.exports = (req,res,next) => {
                 try {
                     const product = await Product.findById(req.params.id).lean();
 
+                    if(!product) {
+                        return res.status(404).json({ message: 'No product found with specified ID.' });
+                    }
+
                     if(decoded.role < 3 || product.sellerId === decoded._id) {
                         req.decoded = decoded;
                         next();
@@ -47,7 +51,8 @@ module.exports = (req,res,next) => {
                         return res.status(401).json({ message: 'access denied.' });
                     }
                 } catch(err) {
-                    return res.status(500).json('MW', err);
+                    console.log('ERROR', err);
+                    return res.status(500).json(err);
                 }
             });
         } else {
