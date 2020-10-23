@@ -37,13 +37,17 @@ module.exports = (req,res,next) => {
                     return res.status(401).json({ message: 'access denied.' });
                 }
 
-                const product = await Product.findById(req.params.id).lean();
-        
-                if(decoded.role < 3 || product.sellerId === decoded._id) {
-                    req.token = decoded;
-                    next();
-                } else {
-                    return res.status(401).json({ message: 'access denied.' });
+                try {
+                    const product = await Product.findById(req.params.id).lean();
+
+                    if(decoded.role < 3 || product.sellerId === decoded._id) {
+                        req.decoded = decoded;
+                        next();
+                    } else {
+                        return res.status(401).json({ message: 'access denied.' });
+                    }
+                } catch(err) {
+                    return res.status(500).json('MW', err);
                 }
             });
         } else {

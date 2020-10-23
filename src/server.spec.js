@@ -256,6 +256,8 @@ describe('server.js', () => {
     describe('/api/products', () => {
         let token;
         let decoded;
+        let jestItem;
+
         beforeAll(() => {
             return supertest(server)
             .post('/api/users/register')
@@ -265,7 +267,7 @@ describe('server.js', () => {
                 decoded = jwt.verify(token, process.env.JWT_SECRET);
             })
             .catch(err => {
-                console.log(token);
+                console.log(err);
             });
         });
 
@@ -321,7 +323,8 @@ describe('server.js', () => {
                 .set('Authorization', token)
                 .set('Accept', 'application/json')
                 .then(res => {
-                    console.log(res.body);
+                    jestItem = res.body;
+                    console.log('jestItem:', jestItem);
                     expect(res.status).toBe(201);
                 })
             });
@@ -333,10 +336,36 @@ describe('server.js', () => {
                 .set('Authorization', token)
                 .set('Accept', 'application/json')
                 .then(res => {
-                    console.log(res.body);
                     expect(res.status).toBe(400);
                 });
             });
+        });
+
+        describe('PUT /:id', () => {
+            it("will return 202 if product info updated successfully", () => {
+                return supertest(server)
+                .put(`/api/products/${jestItem._id}`)
+                .send({ price: 1.50 })
+                .set('Authorization', token)
+                .set('Accept', 'application/json')
+                .then(res => {
+                    console.log(res.body);
+                    expect(res.status).toBe(202);
+                });
+            });
+
+            // it('will return 404 if no product is found with specified id', () => {
+            //     let badId = '5f90e76b2d646166d07da176';
+            //     return supertest(server)
+            //     .put(`/api/products/${badId}`)
+            //     .send({ price: 1.50 })
+            //     .set('Authorization', token)
+            //     .set('Accept', 'application/json')
+            //     .then(res => {
+            //         // console.log('SOME SORTA RESPONSE HERE');
+            //         // expect(res.status).toBe(202);
+            //     });
+            // })
         });
     });
 });
