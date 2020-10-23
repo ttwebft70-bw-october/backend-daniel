@@ -26,8 +26,17 @@ router.post('/', authorize, async (req,res) => {
         const newProduct = new Product({ ...req.body, sellerId: req.userId });
         await newProduct.save();
 
-        res.status(202).json(newProduct);
+        res.status(201).json(newProduct);
     } catch(err) {
+        if(err.errors) {
+            const errors = Object.keys(err.errors);
+            const cleanErrors = [];
+            errors.forEach(key => {
+                cleanErrors.push({ error: key, message: err.errors[key].message });
+            });
+
+            return res.status(400).json(cleanErrors);
+        }
         res.status(500).json(err);
     }
 });

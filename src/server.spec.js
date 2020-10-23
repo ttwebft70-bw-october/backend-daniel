@@ -252,4 +252,91 @@ describe('server.js', () => {
             });
         });
     });
+
+    describe('/api/products', () => {
+        let token;
+        let decoded;
+        beforeAll(() => {
+            return supertest(server)
+            .post('/api/users/register')
+            .send({ username: "jest", email: "jest@jest.com", password: "jestjest" })
+            .then(res => {
+                token = res.body.token;
+                decoded = jwt.verify(token, process.env.JWT_SECRET);
+            })
+            .catch(err => {
+                console.log(token);
+            });
+        });
+
+        afterAll(async () => {
+            await User.findByIdAndDelete(decoded._id);
+            return console.log("♻ USER DELETED ♻", '/api/products');
+        });
+
+        describe('GET /', () => {
+            it('can get a list of all products returning 200', () => {
+                return supertest(server)
+                .get('/api/products')
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(200);
+                });
+            });
+
+            it('will return 401 if user not logged in', () => {
+                return supertest(server)
+                .get('/api/products')
+                .then(res => {
+                    expect(res.status).toBe(401);
+                })
+            });
+        });
+
+        describe('GET /:id', () => {
+            const testProduct = '5f925d2f42771100177d4ce6';
+            it('can get info on a single product returning 200', () => {
+                return supertest(server)
+                .get(`/api/products/${testProduct}`)
+                .set('Authorization', token)
+                .then(res => {
+                    expect(res.status).toBe(200);
+                });
+            });
+
+            it('will return 401 if user is not signed in.', () => {
+                return supertest(server)
+                .get(`/api/products/${testProduct}`)
+                .then(res => {
+                    expect(res.status).toBe(401);
+                })
+            });
+        });
+
+        describe('POST /', () => {
+            it('will return 201 if user successfully created a post', () => {
+                return supertest(server)
+                .post('/api/products')
+                .send({ name: "jest-item", price: 0 })
+                .set('Authorization', token)
+                .set('Accept', 'application/json')
+                .then(res => {
+                    console.log(res.body);
+                    expect(res.status).toBe(201);
+                })
+            });
+
+            it('will return 400 if missing required fields', () => {
+                return supertest(server)
+                .post('/api/products')
+                .send({ name: "jest-item" })
+                .set('Authorization', token)
+                .set('Accept', 'application/json')
+                .then(res => {
+                    console.log(res.body);
+                    expect(res.status).toBe(400);
+                });
+            });
+        });
+    });
 });
